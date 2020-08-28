@@ -49,6 +49,10 @@ img#legal {
   height: 12rem;
 }
 
+img.header {
+  height: 12rem;
+}
+
 .quiz-image-container {
   position: relative;
   transition: all 0.3s ease-in-out;
@@ -133,4 +137,29 @@ img#legal {
 
 .is-masked img {
   filter: contrast(0) opacity(0.2);
+}
+
+.slider-container {
+  position: relative;
+}
+
+.slider {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.slider-min-hint {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+
+.slider-max-hint {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.rounded {
+  border-radius: 0.25rem;
 }

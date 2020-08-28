@@ -18,5 +18,6 @@ urlpatterns = [
     path("register/", views.RegistrationView.as_view(), name="registration"),
 
     path('quizzes/', include('quizzes.urls')),
+    path('umfrage/', include('umfrage.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
   + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
