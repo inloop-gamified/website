@@ -41,10 +41,11 @@ class UmfrageAdmin(admin.ModelAdmin):
     ]
     list_display = [
         'site_link',
+        'get_rule',
         'is_completed',
     ]
     list_filter = [
-        'is_completed'
+        'is_completed',
     ]
     search_fields = [
         'key',
@@ -52,6 +53,10 @@ class UmfrageAdmin(admin.ModelAdmin):
     readonly_fields = [
         'key'
     ]
+
+    def get_rule(self, obj):
+        return obj.violation.rule.identifier
+    get_rule.short_description = 'Rule'
 
     def site_link(self, obj):
         return format_html(f'<a href="/umfrage/{obj.key}/" target="_blank">{obj}</a>')

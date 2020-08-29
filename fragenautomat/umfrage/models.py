@@ -42,6 +42,7 @@ class Violation(models.Model):
 
 class Umfrage(models.Model):
     key = models.CharField(max_length=32, primary_key=True)
+    violation = models.ForeignKey(Violation, on_delete=models.CASCADE)
     is_completed = models.BooleanField(default=False)
 
     def __str__(self):

@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
     def make_umfrage(self, violation):
         key = get_random_string(length=32)
-        umfrage = Umfrage.objects.create(key=key)
+        umfrage = Umfrage.objects.create(key=key, violation=violation)
 
         UmfrageExplanation.objects.create(
             number=0, umfrage=umfrage,
