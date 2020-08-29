@@ -89,7 +89,7 @@ class Command(BaseCommand):
 
         UmfrageRating.objects.create(
             number=11, umfrage=umfrage,
-            text='Wenn Sie eine Aufgabe in INLOOP bestanden haben, wie gern würden Sie dann gern auch nach Anmerkungen in Lösungen anderer Studierender suchen und dafür Punkte erhalten?',
+            text='Wenn Sie eine Aufgabe in INLOOP bestanden haben, wie gern würden Sie dann auch nach Anmerkungen in Lösungen anderer Studierender suchen und dafür Punkte erhalten?',
             min_value_hint='Überhaupt nicht',
             max_value_hint='Sehr gern'
         )
