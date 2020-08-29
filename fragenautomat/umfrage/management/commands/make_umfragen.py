@@ -2,75 +2,33 @@ import json
 
 from django.core.management.base import BaseCommand
 from django.utils.crypto import get_random_string
+from django.db import transaction
 
 from umfrage.models import Violation, Medic, Rule
-from umfrage.models import Umfrage, UmfrageRating, UmfrageViolation, UmfrageExplanation
+from umfrage.models import Umfrage, UmfrageRating, UmfrageViolation, UmfrageExplanation, UmfrageStep
 
 
 class Command(BaseCommand):
-    violations_json_dir = 'fragenautomat/umfrage/management/commands/data/violations.json'
-
-    def load_medics(self):
-        with open(self.violations_json_dir) as f:
-            violations_json = json.load(f)
-
-        for violation in violations_json:
-            medic, created = Medic.objects.get_or_create(
-                name=violation['rule']['medic']['name'],
-                profession=violation['rule']['medic']['profession']
-            )
-            if created:
-                self.stdout.write(self.style.SUCCESS(f'Created {medic}'))
-
-
-    def load_rules(self):
-        with open(self.violations_json_dir) as f:
-            violations_json = json.load(f)
-
-        for violation in violations_json:
-            rule, created = Rule.objects.get_or_create(
-                identifier=violation['rule']['identifier'],
-                explanation=violation['rule']['explanation'],
-                medic_id=violation['rule']['medic']['name']
-            )
-            if created:
-                self.stdout.write(self.style.SUCCESS(f'Created {rule}'))
-
-    def load_violations(self):
-        with open(self.violations_json_dir) as f:
-            violations_json = json.load(f)
-
-        for violation in violations_json:
-            violation, created = Violation.objects.get_or_create(
-                user=violation['user'],
-                task=violation['task'],
-                message=violation['message'],
-                priority=violation['priority'],
-                start_line=violation.get('start_line'),
-                end_line=violation.get('end_line'),
-                start_column=violation.get('start_column'),
-                end_column=violation.get('end_column'),
-                rule_id=violation['rule']['identifier'],
-                file_contents=violation['file_contents']
-            )
-            if created:
-                self.stdout.write(self.style.SUCCESS(f'Created {violation}'))
-
     def make_umfragen(self):
-        for violation in Violation.objects.all():
-            self.make_umfrage(violation)
+        count = Violation.objects.all().count()
+        for i, violation in enumerate(Violation.objects.all()):
+            umfrage = self.make_umfrage(violation)
+            self.stdout.write(self.style.SUCCESS(
+                f'Created {umfrage} ({i}/{count}).'
+            ))
 
     def make_umfrage(self, violation):
-        umfrage = Umfrage.objects.create(key=get_random_string(length=32))
+        key = get_random_string(length=32)
+        umfrage = Umfrage.objects.create(key=key)
 
         UmfrageExplanation.objects.create(
             number=0, umfrage=umfrage,
-            text='Willkommen bei der Umfrage zu Codequalität in INLOOP. Die Bearbeitung dieser Umfrage sollte nicht länger als 10 Minuten dauern.'
+            text='Willkommen bei einer Umfrage zu Codequalität in INLOOP! Die Bearbeitung dieser Umfrage sollte nicht länger als 10 Minuten dauern.'
         )
 
         UmfrageRating.objects.create(
             number=1, umfrage=umfrage,
-            text='Wie häufig haben Sie bei der Benutzung von INLOOP Rücksicht auf Ihre Code-Qualität genommen?',
+            text='Wie häufig haben Sie bei der Benutzung von INLOOP Rücksicht auf die Code-Qualität Ihrer Lösungen genommen?',
             min_value_hint='Noch nie',
             max_value_hint='Jederzeit'
         )
@@ -84,7 +42,7 @@ class Command(BaseCommand):
 
         UmfrageExplanation.objects.create(
             number=3, umfrage=umfrage,
-            text='Um Studierende zu motivieren, die Codequalität von eingereichten Lösungen auf INLOOP zu verbessern, sollen Studierenden einige neue Funktionen bereitgestellt werden.'
+            text='Um Studierende zu motivieren, die Codequalität von eingereichten Lösungen auf INLOOP zu verbessern, sollen den Studierenden einige neue Funktionen bereitgestellt werden.'
         )
 
         UmfrageExplanation.objects.create(
@@ -150,10 +108,7 @@ class Command(BaseCommand):
             max_value_hint='Sehr stark'
         )
 
-        self.stdout.write(self.style.SUCCESS(f'Created {umfrage}'))
+        return umfrage
 
     def handle(self, *args, **kwargs):
-        self.load_medics()
-        self.load_rules()
-        self.load_violations()
         self.make_umfragen()

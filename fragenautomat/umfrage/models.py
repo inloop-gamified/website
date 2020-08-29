@@ -1,15 +1,23 @@
 from django.db import models
+from django.utils.html import format_html
+
 
 
 class Medic(models.Model):
     name = models.TextField(primary_key=True)
     profession = models.TextField()
 
+    def __str__(self):
+        return f'Medic {self.name}'
+
 
 class Rule(models.Model):
     identifier = models.TextField(primary_key=True)
     explanation = models.TextField()
     medic = models.ForeignKey(Medic, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.identifier
 
 
 class Violation(models.Model):
@@ -24,10 +32,20 @@ class Violation(models.Model):
     rule = models.ForeignKey(Rule, on_delete=models.CASCADE)
     file_contents = models.TextField()
 
+    @property
+    def n_lines(self):
+        return len(str(self.file_contents).splitlines())
+
+    def __str__(self):
+        return f'{self.task} ({self.n_lines} Lines): {self.message}'
+
 
 class Umfrage(models.Model):
-    key = models.CharField(max_length=32)
+    key = models.CharField(max_length=32, primary_key=True)
     is_completed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.key
 
 class UmfrageStep(models.Model):
     number = models.PositiveIntegerField()
@@ -54,6 +72,9 @@ class UmfrageRating(UmfrageStep):
     @property
     def mid_value(self):
         return (self.max_value + self.min_value) / 2
+
+    def __str__(self):
+        return f'{self.umfrage}: {self.text}'
 
 
 class UmfrageViolation(UmfrageStep):
