@@ -17,6 +17,7 @@ urlpatterns = [
 
     path('quizzes/', include('quizzes.urls')),
     path('profiles/', include('profiles.urls')),
+    path('umfrage/', include('umfrage.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
   + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
