@@ -15,8 +15,20 @@ h1, .h1 {
   font-size: 3rem;
 }
 
+h2, .h2 {
+  font-size: 2rem;
+}
+
+h3, .h3 {
+  font-size: 1.5rem;
+}
+
 h4, .h4 {
   font-size: 1.25rem;
+}
+
+h5, .h5 {
+  font-size: 1rem;
 }
 
 p, .p {
@@ -28,9 +40,8 @@ p, .p {
 }
 
 nav .input {
-  background: #fafafa;
+  background: #fff;
   border-radius: 2rem;
-  border-style: none;
   padding: 1rem;
 }
 
@@ -71,16 +82,6 @@ img.header {
   object-fit: cover;
 }
 
-.quiz-image-overlay {
-  border-radius: 0.25rem;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
-}
-
 .quiz-image-info {
   border-radius: 0.25rem;
   position: absolute;
@@ -107,7 +108,7 @@ img.header {
 }
 
 .day {
-  border-radius: 2rem;
+  border-radius: 0.25rem;
   background: #fafafa;
   transition: all 0.3s ease-in-out;
 }
@@ -116,7 +117,13 @@ img.header {
   background: #f0f0f0;
 }
 
-.markdown p {
+.markdown p,
+.markdown ul,
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5 {
   margin-bottom: 0.5rem;
 }
 
@@ -162,4 +169,31 @@ img.header {
 
 .rounded {
   border-radius: 0.25rem;
+}
+
+.profile-icon {
+  object-fit: cover;
+}
+
+.round {
+  border-radius: 50%;
+}
+
+.nav-container {
+  background: #fafafa;
+}
+
+.navbar {
+  background: transparent;
+}
+
+.navbar-link.is-active,
+.navbar-link:focus,
+.navbar-link:focus-within,
+.navbar-link:hover,
+a.navbar-item.is-active,
+a.navbar-item:focus,
+a.navbar-item:focus-within,
+a.navbar-item:hover {
+  background-color: #fff;
 }

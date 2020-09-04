@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block body %}
 
 <div class="container">
 
   <div class="columns is-centered">
-    <div class="column is-6 box">
-      <h4>Login</h4>
-      <hr>
+    <div class="column is-4">
+      <img alt="login" src="{% static 'vendor/img/login.svg' %}">
+      <h4 class="mt-6 has-text-centered">Welcome Back!</h4>
 
       {% if form.errors %}
       <div class="notification is-danger">
@@ -25,8 +27,8 @@
         {% endif %}
       {% endif %}
 
-      <form method="POST">
-        {% include 'registration/form.html' %}
+      <form method="POST" class="box mt-4">
+        {% include 'form.html' %}
 
         <input type="hidden" name="next" value="{{ next }}">
 
@@ -35,7 +37,7 @@
             <button type="submit" class="button is-link">Login</button>
           </div>
           <div class="control">
-            <a href="{% url 'registration' %}"
+            <a href="{% url 'profiles:registration' %}"
                class="button is-link is-light">Register</a>
           </div>
         </div>

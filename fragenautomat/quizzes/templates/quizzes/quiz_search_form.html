@@ -1,0 +1,16 @@
+<form method="GET" action="/">
+  <div class="field has-addons mt-6">
+    <div class="control is-expanded">
+      <input class="input is-light"
+              name="q"
+              value="{{ request.GET.q }}"
+              type="text"
+              placeholder="Quiz name, ...">
+    </div>
+    <div class="control">
+      <button type="submit" class="button is-link">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </div>
+</form>

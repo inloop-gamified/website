@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'quizzes',
     'umfrage',
+    'profiles',
 ]
 
 MIDDLEWARE = [
