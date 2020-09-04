@@ -146,6 +146,11 @@ img.header {
   filter: contrast(0) opacity(0.2);
 }
 
+.profile-picture {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .slider-container {
   position: relative;
 }
