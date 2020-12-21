@@ -7,12 +7,45 @@ from django.http import Http404, HttpResponseBadRequest
 from django.core.paginator import InvalidPage
 from django.contrib import messages
 from django.urls import reverse
+from django.db.models.aggregates import Max
+from django.db.models.functions import Coalesce
 
 from fragenautomat.paginators import SingleItemPaginator
+from fragenautomat.sanitization import clean_markdown
 
-from quizzes.sanitization import clean_markdown
-from quizzes.models import Quiz
+from quizzes.models import Quiz, Question, Contributor, Contribution
 from quizzes.forms import QuestionForm
+
+
+def get_next_scoped_id(quiz):
+    query = Question.objects \
+        .filter(quiz=quiz) \
+        .aggregate(next_scoped_id=(Coalesce(Max('scoped_id'), 0) + 1))
+    return query['next_scoped_id']
+
+
+class CreateQuestionView(View):
+    def has_quiz_access(self, quiz):
+        return quiz.contributor_set \
+            .filter(user=self.request.user) \
+            .exists()
+
+    def post(self, request, quiz_slug):
+        quiz = get_object_or_404(Quiz, slug=quiz_slug)
+        if not self.has_quiz_access(quiz):
+            raise Http404
+
+        next_scoped_id = get_next_scoped_id(quiz)
+        example_description = '`This question has just been created and was not edited yet.`'
+        new_question = Question.objects.create(
+            quiz=quiz,
+            scoped_id=next_scoped_id,
+            description=example_description
+        )
+
+        messages.success(request, 'Question created successfully.')
+        url = reverse('quizzes:question', kwargs={'quiz_slug': quiz_slug})
+        return redirect(f'{url}?p={new_question.page_in_quiz}')
 
 
 class QuizPaginator(SingleItemPaginator):
@@ -28,10 +61,10 @@ class QuizPaginator(SingleItemPaginator):
 
 
 class QuestionView(View):
-    def has_form_access(self, quiz):
-        is_author = quiz.author == self.request.user
-        is_superuser = self.request.user.is_superuser
-        return is_author or is_superuser
+    def has_quiz_access(self, quiz):
+        return quiz.contributor_set \
+            .filter(user=self.request.user) \
+            .exists()
 
     def get_page(self, quiz):
         paginator = QuizPaginator(quiz)
@@ -43,21 +76,29 @@ class QuestionView(View):
 
     def get(self, request, quiz_slug):
         quiz = get_object_or_404(Quiz, slug=quiz_slug)
+        quiz.number_of_views += 1
+        quiz.save()
+
         page = self.get_page(quiz)
         question = page.item
+        question.number_of_views += 1
+        question.save()
+
+        has_quiz_access = self.has_quiz_access(quiz)
         context = {
             'quiz': quiz,
             'page': page,
-            'question': question
+            'question': question,
+            'has_quiz_access': has_quiz_access,
         }
-        if self.has_form_access(quiz):
+        if has_quiz_access:
             form = QuestionForm(instance=question)
             context['form'] = form
         return TemplateResponse(request, 'quizzes/question.html', context)
 
     def post(self, request, quiz_slug):
         quiz = get_object_or_404(Quiz, slug=quiz_slug)
-        if not self.has_form_access(quiz):
+        if not self.has_quiz_access(quiz):
             raise Http404
 
         quiz = get_object_or_404(Quiz, slug=quiz_slug)
@@ -79,6 +120,10 @@ class QuestionView(View):
             question.solution_image = solution_image
 
         question.save()
+
+        Contribution.objects.create(
+            question=question, user=self.request.user
+        )
 
         messages.success(request, 'Question updated successfully.')
         url = reverse('quizzes:question', kwargs={'quiz_slug': quiz_slug})
